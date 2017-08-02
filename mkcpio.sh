@@ -18,8 +18,9 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-[[ -e build.env ]] && source build.env
-source func.sh
+_cpio_script_path=$(dirname $(readlink -f $0))
+[[ -e build.env ]] && source ${_cpio_script_path}/build.env
+source ${_cpio_script_path}/func.sh
 
 func_init "mkcpio"
 require "cpio"
@@ -104,14 +105,32 @@ _all_files=""
 msgInfo Building CPIO Image using $_cpio_conf
 source $_cpio_conf
 
+add_file_to_list() {
+    _full_name="${_cpio_root}${1}"
+    if [[ -e $_full_name ]]; then
+        msgStep Adding file: $_full_name
+        _all_files="${_all_files} .${1}"
+    else
+        msgStepError File not found: ${_full_name}
+    fi
+}
+
 if [[ ! -z "$FILES" ]]; then 
     for new_file in $FILES; do
-        _full_name="${_cpio_root}${new_file}"
-        if [[ -e $_full_name ]]; then
-            msgStep Adding file: $_full_name
-            _all_files="${_all_files} .${new_file}"
+        add_file_to_list "${new_file}"
+    done
+fi
+
+if [[ ! -z "$DIRS" ]]; then 
+    for new_dir in $DIRS; do
+        _full_name="${_cpio_root}${new_dir}"
+        if [[ -d $_full_name ]]; then
+            #msgStep Searching directory for files: $_full_name
+            for new_file in $(find $_full_name -type f); do
+                add_file_to_list "${new_file:${#_cpio_root}}"
+            done
         else
-            msgStepError File not found: ${_full_name}
+            msgStepError Directory not found: ${_full_name}
         fi
     done
 fi
