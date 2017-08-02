@@ -35,7 +35,6 @@ INST_OPTS=
 all : build.env check-env
 
 install : func.sh mkcpio.sh build.env check-env
-	echo $(target_dir)
 	@install $(INST_OPTS) -D -m 440 build.env $(target_dir)/build.env
 	@echo "INSTALL - build.env"
 	@install $(INST_OPTS) -D -m 440 func.sh $(target_dir)/func.sh
