@@ -16,11 +16,16 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+ifdef XPREFIX
+	PREFIX="$(XPREFIX)"
+endif
+
 ifndef PREFIX
 	PREFIX="/usr"
 endif
 
 target_dir:=$(PREFIX)/share/mkcpio
+target_sym_dir:=$(PREFIX)/bin
 target_sym:=$(PREFIX)/bin/mkcpio
 #INST_OPTS=-g root -o root -m 440
 INST_OPTS=
@@ -30,6 +35,7 @@ INST_OPTS=
 all : build.env check-env
 
 install : func.sh mkcpio.sh build.env check-env
+	echo $(target_dir)
 	@install $(INST_OPTS) -D -m 440 build.env $(target_dir)/build.env
 	@echo "INSTALL - build.env"
 	@install $(INST_OPTS) -D -m 440 func.sh $(target_dir)/func.sh
@@ -37,6 +43,7 @@ install : func.sh mkcpio.sh build.env check-env
 	@install $(INST_OPTS) -D -m 550 mkcpio.sh $(target_dir)/mkcpio.sh
 	@echo "INSTALL - mkcpio.sh"
 	@unlink $(target_sym) 2>/dev/null | true
+	@mkdir -p $(target_sym_dir)
 	@ln -s $(target_dir)/mkcpio.sh $(target_sym)
 	@echo "LINK    - mkcpio"
 	
