@@ -28,8 +28,14 @@ For more usage details, run `mkcpio -h`.
 ## mkcpio.conf
 
 The mkcpio.conf file, located in `$SYSROOT/etc/`, is used to tell mkcpio what
-files to place in the initfs.cpio image. Currently, the config file only
-supports a list of explicit files.
+files to place in the initfs.cpio image. 
+
+There are 2 facilities to accomplish this goal:
+
+- FILES= used to add specific files into the CPIO archive.
+- DIRS= used to add entire directory trees into the CPIO arcive.
+
+Example
 
 ```bash
 # Add files to include in initfs.cpio
