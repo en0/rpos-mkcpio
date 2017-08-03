@@ -115,6 +115,15 @@ add_file_to_list() {
     fi
 }
 
+if [[ ! -z "${COMPRESSION}" ]]; then
+    _cpio_compression="${COMPRESSION}"
+else
+    _cpio_compression="cat"
+fi
+
+# Whatever is specified as the compression utility needs to be in the path.
+require "${_cpio_compression%%\ *}"
+
 if [[ ! -z "$FILES" ]]; then 
     for new_file in $FILES; do
         add_file_to_list "${new_file}"
@@ -157,7 +166,10 @@ fi
 msgStep Building output: $_cpio_out
 
 set -o pipefail
-_cpio_result=$( { cd ${_cpio_root}; echo -n ${_all_files} | xargs -n1 | cpio -o > ${_cpio_out}; } 2>&1)
+_cpio_result=$( { 
+    cd ${_cpio_root}; 
+    echo -n ${_all_files} | xargs -n1 | cpio -o | ${_cpio_compression} > ${_cpio_out}; 
+} 2>&1)
 
 if [ $? != 0 ]; then
     msgError Unable to create CPIO image: $_cpio_result
